@@ -19,4 +19,5 @@ setup(
     author='Hajime Nakagami',
     author_email='nakagami@gmail.com',
     test_suite="tests",
+    packages=['pyawabi'],
 )
