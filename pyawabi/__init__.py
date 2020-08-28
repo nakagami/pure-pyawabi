@@ -1,1 +1,1 @@
-from . import awabi
+from .awabi import *

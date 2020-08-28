@@ -26,7 +26,7 @@ $ pip install pure-pyawabi
 >>> import pyawabi
 >>> import pprint
 >>> pp = pprint.PrettyPrinter()
->>> pp.pprint(pyawabi.awabi.tokenize("すもももももももものうち"))
+>>> pp.pprint(pyawabi.tokenize("すもももももももものうち"))
 [('すもも', '名詞,一般,*,*,*,*,すもも,スモモ,スモモ'),
  ('も', '助詞,係助詞,*,*,*,*,も,モ,モ'),
  ('もも', '名詞,一般,*,*,*,*,もも,モモ,モモ'),
@@ -34,7 +34,7 @@ $ pip install pure-pyawabi
  ('もも', '名詞,一般,*,*,*,*,もも,モモ,モモ'),
  ('の', '助詞,連体化,*,*,*,*,の,ノ,ノ'),
  ('うち', '名詞,非自立,副詞可能,*,*,*,うち,ウチ,ウチ')]
->>> pp.pprint(pyawabi.awabi.tokenize_n_best("すもももももももものうち", 2))
+>>> pp.pprint(pyawabi.tokenize_n_best("すもももももももものうち", 2))
 [[('すもも', '名詞,一般,*,*,*,*,すもも,スモモ,スモモ'),
   ('も', '助詞,係助詞,*,*,*,*,も,モ,モ'),
   ('もも', '名詞,一般,*,*,*,*,もも,モモ,モモ'),
