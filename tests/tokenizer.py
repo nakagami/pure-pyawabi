@@ -82,6 +82,16 @@ class TestTokenizer(unittest.TestCase):
             results
         )
 
+        self.assertEqual(
+            pyawabi.awabi.tokenize("母はハハハと笑う")[2][0],
+            "ハハハ"
+        )
+
+        self.assertEqual(
+            len(pyawabi.awabi.tokenize("山嵐は might is right という英語を引いて説諭を加えた")),
+            14
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
