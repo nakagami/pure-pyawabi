@@ -20,4 +20,5 @@ setup(
     author_email='nakagami@gmail.com',
     test_suite="tests",
     packages=['pyawabi'],
+    scripts=['bin/pyawabi'],
 )
