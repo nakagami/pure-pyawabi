@@ -26,10 +26,10 @@ from .tokenizer import Tokenizer
 
 
 def tokenize(s):
-    tok = Tokenizer(None)
+    tok = Tokenizer()
     return tok.tokenize(s)
 
 
 def tokenize_n_best(s, n):
-    tok = Tokenizer(None)
+    tok = Tokenizer()
     return tok.tokenize_n_best(s, n)

@@ -28,7 +28,7 @@ from .lattice import Lattice, Node
 
 
 class Tokenizer:
-    def __init__(self, path):
+    def __init__(self, path=None):
         mecabrc_map = mecabrc.get_mecabrc_map(path)
         self.sys_dic = MecabDic(mecabrc.get_dic_path(mecabrc_map, "sys.dic"))
         if "userdic" in mecabrc_map:
