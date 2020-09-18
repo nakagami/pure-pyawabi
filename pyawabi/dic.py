@@ -77,10 +77,10 @@ class CharProperty:
             self.size = self.offset + 0xFFFF * 4
             self.mmap = mmap.mmap(f.fileno(), 0, mmap.MAP_PRIVATE, mmap.PROT_READ)
 
+    @lru_cache(maxsize=1024)
     def get_char_info(self, code_point):
         i = self.offset + code_point * 4
-        data = self.mmap[i:i+4]
-        v = data[0] + (data[1] << 8) + (data[2] << 16) + (data[3] << 24)
+        v = int.from_bytes(self.mmap[i:i+4], byteorder='little')
         return (
             (v >> 18) & 0b11111111,     # default_type
             v & 0b111111111111111111,   # char_type
@@ -217,11 +217,10 @@ class MecabDic:
         feature_offset = self.feature_offset
 
         results = []
-        i = self.token_offset + idx * 16
-        data = mmap[i:i + count * 16]
-        for i in range(count):
+        start = self.token_offset + idx * 16
+        for i in range(start, start+count*16, 16):
             lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
-                'HHHhII', data[i*16: (i+1)*16]
+                'HHHhII', mmap[i: i+16]
             )
             k = j = feature_offset + feature
             while mmap[k]:
