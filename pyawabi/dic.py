@@ -219,21 +219,26 @@ class MecabDic:
         results = []
         start = self.token_offset + idx * 16
         for i in range(start, start+count*16, 16):
-            lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
-                'HHHhII', mmap[i: i+16]
+            #lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
+            #    'HHHhII', mmap[i: i+16]
+            #)
+            lc_attr, rc_attr, posid, wcost, feature = struct.unpack(
+                'HHHhI', mmap[i: i+12]
             )
             k = j = feature_offset + feature
             while mmap[k]:
                 k += 1
-            results.append({
-                "original": s,
-                "lc_attr": lc_attr,
-                "rc_attr": rc_attr,
-                "posid":  posid,
-                "wcost": wcost,
-                "feature": mmap[j:k],
-                "skip": skip,
-            })
+
+            results.append((
+                s,          # original
+                lc_attr,
+                rc_attr,
+                posid,
+                wcost,
+                mmap[j:k],  # feature
+                skip,
+            ))
+
         return results
 
     def get_entries(self, result, s, skip):

@@ -65,7 +65,7 @@ class TestDic(unittest.TestCase):
         cp = CharProperty(mecabrc.get_dic_path(self.mecabrc_map, "char.bin"))
         self.assertEqual(unk_dic.exact_match_search(b'SPACE'), 9729)
         entries, invoke = unk_dic.lookup_unknowns("１９６７年".encode("utf-8"), cp)
-        self.assertEqual(entries[0]["original"], "１９６７".encode("utf-8"))
+        self.assertEqual(entries[0][0], "１９６７".encode("utf-8"))
 
 
 if __name__ == "__main__":

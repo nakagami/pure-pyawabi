@@ -36,7 +36,8 @@ class Node:
 
     @classmethod
     def create_by_entry(cls, e):
-        return cls(e, 0, 0, e["posid"], e["lc_attr"], e["rc_attr"], e["wcost"], 0x7FFFFFFF, -1, -1, e["skip"])
+        original, lc_attr, rc_attr, posid, wcost, feature, skip = e
+        return cls(e, 0, 0, posid, lc_attr, rc_attr, wcost, 0x7FFFFFFF, -1, -1, skip)
 
     def __init__(self, entry, pos, epos, index, left_id, right_id, cost, min_cost, back_pos, back_index, skip):
         self.entry = entry
@@ -59,7 +60,7 @@ class Node:
 
     def node_len(self):
         if self.entry:
-            return len(self.entry["original"])
+            return len(self.entry[0])
         return 1    # BOS or EOS
 
 
