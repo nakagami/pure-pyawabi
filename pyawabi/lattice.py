@@ -78,13 +78,11 @@ class Lattice:
         for enode in self.enodes[self.p]:
             if enode.skip:
                 for enode2 in self.enodes[enode.pos]:
-                    cost = enode2.min_cost + matrix.get_trans_cost(enode2.right_id, node.left_id)
-                    if cost < min_cost:
+                    if cost := enode2.min_cost + matrix.get_trans_cost(enode2.right_id, node.left_id) < min_cost:
                         min_cost = cost
                         best_node = enode2
             else:
-                cost = enode.min_cost + matrix.get_trans_cost(enode.right_id, node.left_id)
-                if cost < min_cost:
+                if cost := enode.min_cost + matrix.get_trans_cost(enode.right_id, node.left_id) < min_cost:
                     min_cost = cost
                     best_node = enode
 

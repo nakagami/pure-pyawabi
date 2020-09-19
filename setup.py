@@ -12,6 +12,7 @@ setup(
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3.8",
         "Operating System :: POSIX",
     ],
     keywords=['MeCab'],
