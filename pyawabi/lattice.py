@@ -26,6 +26,9 @@ import heapq
 
 
 class Node:
+
+    __slots__ = ["entry", "pos", "epos", "index", "left_id", "right_id", "cost", "min_cost", "back_pos", "back_index", "skip"]
+
     @classmethod
     def create_bos(cls):
         return cls(None, 0, 1, 0, -1, 0, 0, 0, -1, -1, False)
