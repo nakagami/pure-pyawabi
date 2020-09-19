@@ -27,7 +27,7 @@ import heapq
 
 class Node:
 
-    __slots__ = ["entry", "pos", "epos", "index", "left_id", "right_id", "cost", "min_cost", "back_pos", "back_index", "skip"]
+    __slots__ = ["entry", "node_len", "pos", "epos", "index", "left_id", "right_id", "cost", "min_cost", "back_pos", "back_index", "skip"]
 
     @classmethod
     def create_bos(cls):
@@ -54,18 +54,13 @@ class Node:
         self.back_pos = back_pos
         self.back_index = back_index
         self.skip = skip
+        self.node_len = len(self.entry[0]) if self.entry else 1     # 1: BOS or EOS
 
     def is_bos(self):
         return self.entry is None and self.pos == 0
 
     def is_eos(self):
         return self.entry is None and self.pos != 0
-
-    def node_len(self):
-        if self.entry:
-            return len(self.entry[0])
-        return 1    # BOS or EOS
-
 
 class Lattice:
     def __init__(self, size):
@@ -93,7 +88,7 @@ class Lattice:
         node.back_index = best_node.index
         node.back_pos = best_node.pos
         node.pos = self.p
-        node.epos = self.p + node.node_len()
+        node.epos = self.p + node.node_len
         node.index = len(self.snodes[self.p])
         self.snodes[node.pos].append(node)
         self.enodes[node.epos].append(node)
@@ -140,7 +135,7 @@ class Lattice:
                 n -= 1
             else:
                 node = bp.path[-1]
-                epos = node.epos - node.node_len()
+                epos = node.epos - node.node_len
                 for index in range(len(self.enodes[epos])):
                     node = self.enodes[epos][index]
                     heapq.heappush(pq, BackwardPath(matrix, node, bp))
