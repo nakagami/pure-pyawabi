@@ -212,16 +212,16 @@ class MecabDic:
         return results
 
     @lru_cache(maxsize=1024)
-    def get_entries_by_index(self, idx, count, s, skip):
+    def _get_entries_by_index(self, idx, count):
         mmap = self.mmap
         feature_offset = self.feature_offset
 
         results = []
         start = self.token_offset + idx * 16
         for i in range(start, start+count*16, 16):
-            #lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
-            #    'HHHhII', mmap[i: i+16]
-            #)
+            # lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
+            #     'HHHhII', mmap[i: i+16]
+            # )
             lc_attr, rc_attr, posid, wcost, feature = struct.unpack(
                 'HHHhI', mmap[i: i+12]
             )
@@ -230,16 +230,19 @@ class MecabDic:
                 k += 1
 
             results.append((
-                s,          # original
                 lc_attr,
                 rc_attr,
                 posid,
                 wcost,
                 mmap[j:k],  # feature
-                skip,
             ))
 
         return results
+
+    def get_entries_by_index(self, idx, count, s, skip):
+        return [
+            (s, r[0], r[1], r[2], r[3], r[4], skip) for r in self._get_entries_by_index(idx, count)
+        ]
 
     def get_entries(self, result, s, skip):
         return self.get_entries_by_index(result >> 8, result & 0xFF, s, skip)
