@@ -6,6 +6,8 @@ If you have Rust development environment, see also https://github.com/nakagami/p
 
 ## Requirements
 
+Python 3.8+
+
 MeCab dictionary
 
 ex) Ubuntu
