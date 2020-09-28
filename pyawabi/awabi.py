@@ -21,15 +21,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 ################################################################################
+from typing import List
+from .tokenizer import Tokenizer    # type: ignore
 
-from .tokenizer import Tokenizer
 
-
-def tokenize(s):
+def tokenize(s: str) -> List[str]:
     tok = Tokenizer()
     return tok.tokenize(s)
 
 
-def tokenize_n_best(s, n):
+def tokenize_n_best(s: str, n: int) -> List[List[str]]:
     tok = Tokenizer()
     return tok.tokenize_n_best(s, n)
