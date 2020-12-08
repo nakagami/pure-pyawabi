@@ -2,9 +2,9 @@ from setuptools import setup
 
 setup(
     name="pure-pyawabi",
-    version="0.2.1",
+    version="0.2.2",
     description='A morphological analyzer awabi clone',
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type="text/markdown",
     url='https://github.com/nakagami/pure-pyawabi/',
     classifiers=[
