@@ -62,6 +62,12 @@ class Node:
     def is_eos(self):
         return self.original is None and self.pos != 0
 
+    def __repr__(self):
+        original = self.original.decode('utf-8') if self.original else ""
+        feature = self.feature.decode('utf-8') if self.feature else ""
+        return f"{original},{feature},{self.node_len},{self.pos},{self.epos},{self.index},{self.left_id},{self.right_id},{self.cost},{self.min_cost},{self.back_pos},{self.back_index},{self.skip}"
+
+
 class Lattice:
     def __init__(self, size):
         bos = Node.create_bos()
@@ -140,6 +146,22 @@ class Lattice:
                     node = self.enodes[epos][index]
                     heapq.heappush(pq, BackwardPath(matrix, node, bp))
         return paths
+
+    def _dump_nodes(self, prompt, nodes):
+        print("+" * 110)
+        print(prompt)
+        for node_list in nodes:
+            print("-" * 110)
+            for node in node_list:
+                print(node)
+
+    def dump_snodes(self):
+        # for debug
+        self._dump_nodes("snodes", self.snodes)
+
+    def dump_enodes(self):
+        # for debug
+        self._dump_nodes("enodes", self.enodes)
 
 
 class BackwardPath:

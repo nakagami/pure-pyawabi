@@ -69,6 +69,10 @@ class Tokenizer:
             pos += lat.forward()
 
         lat.end(self.matrix)
+
+        # lat.dump_snodes()
+        # lat.dump_enodes()
+
         return lat
 
     def tokenize(self, s):
