@@ -25,6 +25,7 @@
 import mmap
 import struct
 from functools import lru_cache
+from collections import namedtuple
 
 MAX_GROUPING_SIZE = 24
 
@@ -63,6 +64,9 @@ def utf8_to_ucs2(s, index):
     else:
         ch16 = (((ch32-0x10000) // 0x400 + 0xD800) << 8) + ((ch32-0x10000) % 0x400 + 0xDC00)
     return ch16, ln
+
+
+DicEntry = namedtuple("DicEntry", ["original", "lc_attr", "rc_attr", "posid", "wcost", "feature", "skip"])
 
 
 class CharProperty:
@@ -219,9 +223,6 @@ class MecabDic:
         results = []
         start = self.token_offset + idx * 16
         for i in range(start, start+count*16, 16):
-            # lc_attr, rc_attr, posid, wcost, feature, compound = struct.unpack(
-            #     'HHHhII', mmap[i: i+16]
-            # )
             lc_attr, rc_attr, posid, wcost, feature = struct.unpack(
                 'HHHhI', mmap[i: i+12]
             )
@@ -241,7 +242,7 @@ class MecabDic:
 
     def get_entries_by_index(self, idx, count, s, skip):
         return [
-            (s, r[0], r[1], r[2], r[3], r[4], skip) for r in self._get_entries_by_index(idx, count)
+            DicEntry(s, r[0], r[1], r[2], r[3], r[4], skip) for r in self._get_entries_by_index(idx, count)
         ]
 
     def get_entries(self, result, s, skip):
