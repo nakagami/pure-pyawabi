@@ -78,7 +78,7 @@ class Tokenizer:
         morphemes = []
         for node in nodes[1:-1]:
             morphemes.append(
-                (node.entry.original.decode('utf-8'), node.entry.feature.decode('utf-8'))
+                (node.original.decode('utf-8'), node.feature.decode('utf-8'))
             )
         return morphemes
 
@@ -89,7 +89,7 @@ class Tokenizer:
             morphemes = []
             for node in nodes[1:-1]:
                 morphemes.append(
-                    (node.entry.original.decode('utf-8'), node.entry.feature.decode('utf-8'))
+                    (node.original.decode('utf-8'), node.feature.decode('utf-8'))
                 )
             morphemes_list.append(morphemes)
 

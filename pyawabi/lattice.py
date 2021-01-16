@@ -27,22 +27,23 @@ import heapq
 
 class Node:
 
-    __slots__ = ["entry", "node_len", "pos", "epos", "index", "left_id", "right_id", "cost", "min_cost", "back_pos", "back_index", "skip"]
+    __slots__ = ["original", "feature", "node_len", "pos", "epos", "index", "left_id", "right_id", "cost", "min_cost", "back_pos", "back_index", "skip"]
 
     @classmethod
     def create_bos(cls):
-        return cls(None, 0, 1, 0, -1, 0, 0, 0, -1, -1, False)
+        return cls(None, None, 0, 1, 0, -1, 0, 0, 0, -1, -1, False)
 
     @classmethod
     def create_eos(cls, pos):
-        return cls(None, pos, pos + 1, 0, 0, -1, 0, 0x7FFFFFFF, -1, -1, False)
+        return cls(None, None, pos, pos + 1, 0, 0, -1, 0, 0x7FFFFFFF, -1, -1, False)
 
     @classmethod
     def create_by_entry(cls, e):
-        return cls(e, 0, 0, e.posid, e.lc_attr, e.rc_attr, e.wcost, 0x7FFFFFFF, -1, -1, e.skip)
+        return cls(e.original, e.feature, 0, 0, e.posid, e.lc_attr, e.rc_attr, e.wcost, 0x7FFFFFFF, -1, -1, e.skip)
 
-    def __init__(self, entry, pos, epos, index, left_id, right_id, cost, min_cost, back_pos, back_index, skip):
-        self.entry = entry
+    def __init__(self, original, feature, pos, epos, index, left_id, right_id, cost, min_cost, back_pos, back_index, skip):
+        self.original = original
+        self.feature = feature
         self.pos = pos
         self.epos = epos
         self.index = index
@@ -53,13 +54,13 @@ class Node:
         self.back_pos = back_pos
         self.back_index = back_index
         self.skip = skip
-        self.node_len = len(self.entry.original) if self.entry else 1     # 1: BOS or EOS
+        self.node_len = len(self.original) if self.original else 1     # 1: BOS or EOS
 
     def is_bos(self):
-        return self.entry is None and self.pos == 0
+        return self.original is None and self.pos == 0
 
     def is_eos(self):
-        return self.entry is None and self.pos != 0
+        return self.original is None and self.pos != 0
 
 class Lattice:
     def __init__(self, size):
