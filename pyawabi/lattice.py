@@ -130,11 +130,11 @@ class Lattice:
         while pq and n:
             bp = heapq.heappop(pq)
             if bp.is_complete():
-                bp.path.reverse()
-                paths.append(bp.path)
+                bp.back_path.reverse()
+                paths.append(bp.back_path)
                 n -= 1
             else:
-                node = bp.path[-1]
+                node = bp.back_path[-1]
                 epos = node.epos - node.node_len
                 for index in range(len(self.enodes[epos])):
                     node = self.enodes[epos][index]
@@ -148,19 +148,19 @@ class BackwardPath:
         if right_path is None:
             assert node.is_eos()
             self.cost_from_eos = 0
-            self.path = [node]
+            self.back_path = [node]
         else:
-            neighbor_node = right_path.path[-1]
+            neighbor_node = right_path.back_path[-1]
             self.cost_from_eos = (
                 right_path.cost_from_eos +
                 neighbor_node.cost +
                 matrix.get_trans_cost(node.right_id, neighbor_node.left_id)
             )
-            self.path = right_path.path[:]
-            self.path.append(node)
+            self.back_path = right_path.back_path[:]
+            self.back_path.append(node)
 
     def __lt__(self, other):
         return self.cost_from_bos + self.cost_from_eos < other.cost_from_bos + other.cost_from_eos
 
     def is_complete(self):
-        return self.path[-1].is_bos()
+        return self.back_path[-1].is_bos()
