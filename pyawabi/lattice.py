@@ -145,11 +145,10 @@ class Lattice:
 class BackwardPath:
     def __init__(self, matrix, node, right_path=None):
         self.cost_from_bos = node.min_cost
-        if right_path is None:
-            assert node.is_eos()
-            self.cost_from_eos = 0
-            self.back_path = [node]
-        else:
+        self.cost_from_eos = 0
+        self.back_path = []
+
+        if right_path is not None:
             neighbor_node = right_path.back_path[-1]
             self.cost_from_eos = (
                 right_path.cost_from_eos +
@@ -157,7 +156,10 @@ class BackwardPath:
                 matrix.get_trans_cost(node.right_id, neighbor_node.left_id)
             )
             self.back_path = right_path.back_path[:]
-            self.back_path.append(node)
+        else:
+            assert node.is_eos()
+
+        self.back_path.append(node)
 
     def __lt__(self, other):
         return self.cost_from_bos + self.cost_from_eos < other.cost_from_bos + other.cost_from_eos
