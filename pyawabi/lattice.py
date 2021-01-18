@@ -142,8 +142,8 @@ class Lattice:
             else:
                 node = bp.back_path[-1]
                 epos = node.epos - node.node_len
-                for index in range(len(self.enodes[epos])):
-                    node = self.enodes[epos][index]
+                for i in range(len(self.enodes[epos])):
+                    node = self.enodes[epos][i]
                     heapq.heappush(pq, BackwardPath(matrix, node, bp))
         return paths
 
