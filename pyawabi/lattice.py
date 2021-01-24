@@ -147,21 +147,25 @@ class Lattice:
                     heapq.heappush(pq, BackwardPath(matrix, node, bp))
         return paths
 
-    def _dump_nodes(self, prompt, nodes):
+    def _dump_nodes_list(self, prompt, nodes_list):
         print("+" * 110)
         print(prompt)
-        for node_list in nodes:
+        for nodes in nodes_list:
             print("-" * 110)
-            for node in node_list:
-                print(node)
+            self._dump_nodes(nodes)
 
-    def dump_snodes(self):
-        # for debug
-        self._dump_nodes("snodes", self.snodes)
+    def _dump_nodes(self, nodes):
+        print("-" * 110)
+        for node in nodes:
+            print(node)
 
-    def dump_enodes(self):
+    def dump_snodes_list(self):
         # for debug
-        self._dump_nodes("enodes", self.enodes)
+        self._dump_nodes_list("snodes", self.snodes)
+
+    def dump_enodes_list(self):
+        # for debug
+        self._dump_nodes_list("enodes", self.enodes)
 
 
 class BackwardPath:

@@ -70,8 +70,8 @@ class Tokenizer:
 
         lat.end(self.matrix)
 
-        # lat.dump_snodes()
-        # lat.dump_enodes()
+        # lat.dump_snodes_list()
+        # lat.dump_enodes_list()
 
         return lat
 
