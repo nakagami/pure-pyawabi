@@ -74,21 +74,21 @@ class TestTokenizer(unittest.TestCase):
         )
 
         self.assertEqual(
-            pyawabi.awabi.tokenize("すもももももももものうち"),
+            pyawabi.tokenize("すもももももももものうち"),
             results[0]
         )
         self.assertEqual(
-            pyawabi.awabi.tokenize_n_best("すもももももももものうち", 3),
+            pyawabi.tokenize_n_best("すもももももももものうち", 3),
             results
         )
 
         self.assertEqual(
-            pyawabi.awabi.tokenize("母はハハハと笑う")[2][0],
+            pyawabi.tokenize("母はハハハと笑う")[2][0],
             "ハハハ"
         )
 
         self.assertEqual(
-            len(pyawabi.awabi.tokenize("山嵐は might is right という英語を引いて説諭を加えた")),
+            len(pyawabi.tokenize("山嵐は might is right という英語を引いて説諭を加えた")),
             14
         )
 
