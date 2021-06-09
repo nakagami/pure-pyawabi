@@ -31,14 +31,15 @@ def main():
     parser.add_argument('-N', '--nbest', type=int)
     args = parser.parse_args()
 
+    tokenizer = pyawabi.Tokenizer()
     for s in sys.stdin.readlines():
         if args.nbest:
-            for tokens in pyawabi.tokenize_n_best(s, args.nbest):
+            for tokens in tokenizer.tokenize_n_best(s, args.nbest):
                 for token in tokens:
                     print("{}\t{}".format(token[0], token[1]))
                 print("EOS")
         else:
-            for token in pyawabi.tokenize(s):
+            for token in tokenizer.tokenize(s):
                 print("{}\t{}".format(token[0], token[1]))
             print("EOS")
 
