@@ -32,38 +32,16 @@ MAX_GROUPING_SIZE = 24
 
 def utf8_to_ucs2(s, index):
     # utf8 to ucs2(16bit) code and it's array size
-    ln = 0
-
-    if (s[index] & 0b10000000) == 0b00000000:
-        ln = 1
-    elif (s[index] & 0b11100000) == 0b11000000:
-        ln = 2
-    elif (s[index] & 0b11110000) == 0b11100000:
-        ln = 3
-    elif (s[index] & 0b11111000) == 0b11110000:
-        ln = 4
-
-    if ln == 1:
-        ch32 = s[index+0]
-    elif ln == 2:
-        ch32 = (s[index+0] & 0x1F) << 6
-        ch32 |= s[index+1] & 0x3F
-    elif ln == 3:
-        ch32 = (s[index+0] & 0x0F) << 12
-        ch32 |= (s[index+1] & 0x3F) << 6
-        ch32 |= s[index+2] & 0x3F
-    elif ln == 4:
-        ch32 = (s[index+0] & 0x07) << 18
-        ch32 |= (s[index+1] & 0x3F) << 12
-        ch32 |= (s[index+2] & 0x3F) << 6
-        ch32 |= s[index+3] & 0x03F
-
-    # ucs4 to ucs2
-    if ch32 < 0x10000:
-        ch16 = ch32
-    else:
-        ch16 = (((ch32-0x10000) // 0x400 + 0xD800) << 8) + ((ch32-0x10000) % 0x400 + 0xDC00)
-    return ch16, ln
+    s0 = s[index]
+    if (s0 & 0b10000000) == 0b00000000:
+        return s0, 1
+    elif (s0 & 0b11100000) == 0b11000000:
+        return ((s0 & 0x1F) << 6) | (s[index+1] & 0x3F), 2
+    elif (s0 & 0b11110000) == 0b11100000:
+        return ((s0 & 0x0F) << 12) | ((s[index+1] & 0x3F) << 6) | (s[index+2] & 0x3F), 3
+    elif (s0 & 0b11111000) == 0b11110000:
+        ch32 = ((s0 & 0x07) << 18) | ((s[index+1] & 0x3F) << 12) | ((s[index+2] & 0x3F) << 6) | (s[index+3] & 0x03F)
+        return (((ch32-0x10000) // 0x400 + 0xD800) << 8) + ((ch32-0x10000) % 0x400 + 0xDC00), 4
 
 
 DicEntry = namedtuple("DicEntry", ["original", "lc_attr", "rc_attr", "posid", "wcost", "feature", "skip"])
@@ -81,26 +59,23 @@ class CharProperty:
             self.size = self.offset + 0xFFFF * 4
             self.mmap = mmap.mmap(f.fileno(), 0, mmap.MAP_PRIVATE, mmap.PROT_READ)
 
-    @lru_cache(maxsize=1024)
+    def get_char_type(self, code_point):
+        return struct.unpack_from('I', self.mmap, self.offset + code_point * 4)[0] & 0b111111111111111111
+
     def get_char_info(self, code_point):
-        i = self.offset + code_point * 4
-        v = int.from_bytes(self.mmap[i:i+4], byteorder='little')
+        v = struct.unpack_from('I', self.mmap, self.offset + code_point * 4)[0]
         return (
             (v >> 18) & 0b11111111,     # default_type
-            v & 0b111111111111111111,   # char_type
             (v >> 26) & 0b1111,         # char_count
             (v >> 30) & 0b1,            # group
             (v >> 31) & 0b1,            # invoke
         )
 
     def get_group_length(self, s, default_type):
-        i = 0
-        char_count = 0
+        i = char_count = 0
         while i < len(s):
             ch16, ln = utf8_to_ucs2(s, i)
-            _, t, _, _, _ = self.get_char_info(ch16)
-
-            if ((1 << default_type) & t) != 0:
+            if ((1 << default_type) & self.get_char_type(ch16)) != 0:
                 i += ln
                 char_count += 1
                 if char_count > MAX_GROUPING_SIZE + 1:
@@ -111,14 +86,12 @@ class CharProperty:
         return i
 
     def get_count_length(self, s, default_type, count):
-        i = 0
-        j = 0
+        i = j = 0
         while j < count:
             if i >= len(s):
                 return -1
             ch16, ln = utf8_to_ucs2(s, i)
-            _, t, _, _, _ = self.get_char_info(ch16)
-            if ((1 << default_type) & t) == 0:
+            if ((1 << default_type) & self.get_char_type(ch16)) == 0:
                 return -1
             i += ln
             j += 1
@@ -129,7 +102,7 @@ class CharProperty:
         ln_list = []
         ch16, first_ln = utf8_to_ucs2(s, 0)
 
-        default_type, _, count, group, invoke = self.get_char_info(ch16)
+        default_type, count, group, invoke = self.get_char_info(ch16)
         if group != 0:
             ln = self.get_group_length(s, default_type)
             if ln > 0:
@@ -171,10 +144,8 @@ class MecabDic:
             self.token_offset = 72 + dsize
             self.feature_offset = self.token_offset + tsize
 
-    @lru_cache(maxsize=1024)
     def _get_base_check(self, idx):
-        i = self.da_offset + idx * 8
-        return struct.unpack('iI', self.mmap[i:i+8])
+        return struct.unpack_from('iI', self.mmap, self.da_offset + idx * 8)
 
     def exact_match_search(self, s):
         v = -1
@@ -223,9 +194,7 @@ class MecabDic:
         results = []
         start = self.token_offset + idx * 16
         for i in range(start, start+count*16, 16):
-            lc_attr, rc_attr, posid, wcost, feature = struct.unpack(
-                'HHHhI', mmap[i: i+12]
-            )
+            lc_attr, rc_attr, posid, wcost, feature = struct.unpack_from('HHHhI', mmap, i)
             k = j = feature_offset + feature
             while mmap[k]:
                 k += 1
@@ -251,10 +220,9 @@ class MecabDic:
     def lookup(self, s):
         results = []
         for result, ln in self.common_prefix_search(s):
-            idx = result >> 8
-            count = result & 0xff
-            entries = self.get_entries_by_index(idx, count, s[:ln], False)
-            results.extend(entries)
+            results.extend(
+                self.get_entries_by_index(result >> 8, result & 0xff, s[:ln], False)
+            )
         return results
 
     def lookup_unknowns(self, s, cp):
@@ -263,8 +231,9 @@ class MecabDic:
         result = self.exact_match_search(category_name)
         results = []
         for ln in ln_list:
-            new_results = self.get_entries(result, s[:ln], category_name == b"SPACE")
-            results.extend(new_results)
+            results.extend(
+                self.get_entries(result, s[:ln], category_name == b"SPACE")
+            )
         return results, invoke
 
 
@@ -276,5 +245,4 @@ class Matrix:
             self.rsize = int.from_bytes(self.mmap[2:4], byteorder='little')
 
     def get_trans_cost(self, id1, id2):
-        i = (id2 * self.lsize + id1) * 2 + 4
-        return int.from_bytes(self.mmap[i:i+2], byteorder='little', signed=True)
+        return struct.unpack_from('h', self.mmap, (id2 * self.lsize + id1) * 2 + 4)[0]
