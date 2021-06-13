@@ -66,6 +66,7 @@ class CharProperty:
         v = struct.unpack_from('I', self.mmap, self.offset + code_point * 4)[0]
         return (
             (v >> 18) & 0b11111111,     # default_type
+            v & 0b111111111111111111,   # char_type
             (v >> 26) & 0b1111,         # char_count
             (v >> 30) & 0b1,            # group
             (v >> 31) & 0b1,            # invoke
@@ -102,7 +103,7 @@ class CharProperty:
         ln_list = []
         ch16, first_ln = utf8_to_ucs2(s, 0)
 
-        default_type, count, group, invoke = self.get_char_info(ch16)
+        default_type, _, count, group, invoke = self.get_char_info(ch16)
         if group != 0:
             ln = self.get_group_length(s, default_type)
             if ln > 0:
