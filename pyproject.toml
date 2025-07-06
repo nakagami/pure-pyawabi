@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pure-pyawabi"
+version = "0.2.4"
+description = "A morphological analyzer awabi clone"
+readme = "README.md"
+classifiers=[
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Operating System :: POSIX",
+]
+keywords=['MeCab']
+authors = [
+    { name = "Hajime Nakagami", email = "nakagami@gmail.com" },
+]
+
+[project.urls]
+"Homepage" = "https://github.com/nakagami/pure-pyawabi/"
+
+[project.scripts]
+pyawabi = "pyawabi.main:main"
